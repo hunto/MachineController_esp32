@@ -57,9 +57,9 @@ static const char *TAG2 = "uart_events";
  * - pin assignment: txd(default), rxd(default)
  */
 
-#define EX_UART_NUM UART_NUM_0
+#define EX_UART_NUM UART_NUM_1
 
-#define BUF_SIZE (100)
+#define BUF_SIZE (10000)
 static QueueHandle_t uart0_queue;
 
 static void uart_event_task(void *pvParameters)
@@ -79,6 +79,7 @@ static void uart_event_task(void *pvParameters)
                 in this example, we don't process data in event, but read data outside.*/
                 case UART_DATA:
                     uart_get_buffered_data_len(EX_UART_NUM, &buffered_size);
+                    // TODO: handler data here
                     ESP_LOGI(TAG2, "data, len: %d; buffered len: %d", event.size, buffered_size);
                     break;
                 //Event of HW FIFO overflow detected
@@ -93,6 +94,7 @@ static void uart_event_task(void *pvParameters)
                     ESP_LOGI(TAG2, "ring buffer full\n");
                     //If buffer full happened, you should consider encreasing your buffer size
                     //We can read data out out the buffer, or directly flush the rx buffer.
+                    // TODO: encreasing buffer instead of flush
                     uart_flush(EX_UART_NUM);
                     break;
                 //Event of UART RX break detected
@@ -141,7 +143,7 @@ void uart_init(void *pvParameters) {
   uart_driver_install(EX_UART_NUM, BUF_SIZE * 2, BUF_SIZE * 2, 10, &uart0_queue, 0);
 
   //Set UART pins (using UART0 default pins ie no changes.)
-  uart_set_pin(EX_UART_NUM, GPIO_NUM_17, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+  uart_set_pin(EX_UART_NUM, GPIO_NUM_17, GPIO_NUM_16, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
   //Set uart pattern detect function.
   //uart_enable_pattern_det_intr(EX_UART_NUM, '+', 3, 10000, 10, 10);
@@ -150,12 +152,13 @@ void uart_init(void *pvParameters) {
   //process data
   uint8_t* data = (uint8_t*) malloc(BUF_SIZE);
   do {
-      vTaskDelay(1000 / portTICK_RATE_MS);//every 3s
-      uart_write_bytes(EX_UART_NUM, (const char*)"data\n", 6);
+      // vTaskDelay(1000 / portTICK_RATE_MS);//every 3s
+      // uart_write_bytes(EX_UART_NUM, (const char*)"data\n", 6);
       int len = uart_read_bytes(EX_UART_NUM, data, BUF_SIZE, 100 / portTICK_RATE_MS);
       if(len > 0) {
           ESP_LOGI(TAG, "uart read : %d", len);
-          uart_write_bytes(EX_UART_NUM, (const char*)"data", len);
+	  // TODO:sth handle the commander string
+          uart_write_bytes(EX_UART_NUM, (const char*)data, len);
       }
   } while(1);
 }
@@ -230,5 +233,5 @@ void app_main(void)
     wifi_init_sta();
 #endif /*EXAMPLE_ESP_WIFI_MODE_AP*/
     xTaskCreate(&tcp_conn, "tcp_conn", 4096, NULL, 5, NULL);
-    xTaskCreate(&uart_init, "uart_init", 4096, NULL, 5, NULL);
+    xTaskCreate(&uart_init, "uart_init", 4096, NULL, 5, NULL);h
 }
