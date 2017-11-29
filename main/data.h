@@ -7,22 +7,22 @@ typedef struct Data {
     char dataName[20];
     char type[20];
     char value[50];
-    DataStructure next;
-    DataStructure prev;
+    struct Data* next;
+    struct Data* prev;
 }*DataStructure;
 
 
 
-
+// data find util
 DataStructure getDataStructure(DataStructure head, char* id);
 
-
-
 // receive str to struct function
-DataStructure createDataStructure(char* dataStr);
+DataStructure createDataStructure(uint8_t* dataStr);
+char* dataStructureToString(DataStructure data);
 
 // List
 void listAdd(DataStructure head, DataStructure addData);
+
 void listDelete(DataStructure deleteData);
 
 

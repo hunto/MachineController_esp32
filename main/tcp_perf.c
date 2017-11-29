@@ -144,15 +144,17 @@ void recv_data(void *pvParameters)
     int len = 0;
     char databuff[EXAMPLE_DEFAULT_PKTSIZE];
     while (1) {
-	len = recv(connect_socket, databuff, EXAMPLE_DEFAULT_PKTSIZE, 0);
-	if (len > 0) {
-	    total_data += len;
-	} else {
+	    len = recv(connect_socket, databuff, EXAMPLE_DEFAULT_PKTSIZE, 0);
+	    if (len > 0) {
+	        //total_data += len;
+            printf("%s\n", databuff);
+	    }
+        else {
             if (LOG_LOCAL_LEVEL >= ESP_LOG_DEBUG) {
-	        show_socket_error_reason(connect_socket);
+	            show_socket_error_reason(connect_socket);
             }
-	    vTaskDelay(100 / portTICK_RATE_MS);
-	}
+	        vTaskDelay(100 / portTICK_RATE_MS);
+	    }
     }
 }
 
@@ -247,6 +249,10 @@ void wifi_init_softap()
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     wifi_config_t wifi_config = {
+        .sta = {
+            .ssid = "Oneplus3",
+            .password = "1473692580"
+        },
         .ap = {
             .ssid = EXAMPLE_DEFAULT_SSID,
             .ssid_len = 0,
@@ -259,7 +265,7 @@ void wifi_init_softap()
 	wifi_config.ap.authmode = WIFI_AUTH_OPEN;
     }
 
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
     ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
     ESP_ERROR_CHECK(esp_wifi_start());
 
