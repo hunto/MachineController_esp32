@@ -248,11 +248,14 @@ void wifi_init_softap()
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    wifi_config_t wifi_config = {
+    wifi_config_t sta_config = {
         .sta = {
-            .ssid = "Oneplus3",
-            .password = "1473692580"
-        },
+            .ssid = "OnePlus3",
+            .password = "1473692580",
+            .bssid_set = false
+        }
+    };
+    wifi_config_t ap_config = {
         .ap = {
             .ssid = EXAMPLE_DEFAULT_SSID,
             .ssid_len = 0,
@@ -262,12 +265,15 @@ void wifi_init_softap()
         },
     };
     if (strlen(EXAMPLE_DEFAULT_PWD) ==0) {
-	wifi_config.ap.authmode = WIFI_AUTH_OPEN;
+	    ap_config.ap.authmode = WIFI_AUTH_OPEN;
     }
 
     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_APSTA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config));
+    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &sta_config));
+    esp_err_t tmp =  esp_wifi_set_config(WIFI_IF_AP, &ap_config);
     ESP_ERROR_CHECK(esp_wifi_start());
+    esp_wifi_connect();
+
 
     ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s \n",
     	    EXAMPLE_DEFAULT_SSID, EXAMPLE_DEFAULT_PWD);
