@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 
+#include "uart_util.h"
+
 
 /*test options*/
 #define EXAMPLE_ESP_WIFI_MODE_AP CONFIG_TCP_PERF_WIFI_MODE_AP //TRUE:AP FALSE:STA

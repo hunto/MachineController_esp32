@@ -1,5 +1,10 @@
 #include "tcp_util.h"
 
+/* for rand number */
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
 /* tcp_perf Example
 
    This example code is in the Public Domain (or CC0 licensed, at your option.)
@@ -57,6 +62,9 @@ void tcp_conn(void *pvParameters){
 	      vTaskDelete(NULL);
     }
 
+    xTaskCreate(&recv_data, "recv_data", 4096, NULL, 5, NULL);
+    
+
     /*create a task to tx/rx data*/
     // TaskHandle_t tx_rx_task;
 // #if EXAMPLE_ESP_TCP_PERF_TX
@@ -64,13 +72,38 @@ void tcp_conn(void *pvParameters){
 // #else /*EXAMPLE_ESP_TCP_PERF_TX*/
     // xTaskCreate(&recv_data, "recv_data", 4096, NULL, 4, &tx_rx_task);
 // #endif
-    send_data("This is a test.\n");
+    // send_data("This is a test.\n");
 
+    int i = 0;
+    char buf[50];
+    int last = 0;
+
+    // vTaskDelay(3000 / portTICK_RATE_MS);//every 3s
+    // send_data("{software_info,软件信息,text,esp固件版本号：v1.0 beta}\n");
+    // vTaskDelay(3000 / portTICK_RATE_MS);//every 3s
+    // send_data("{machine_info,设备信息,text,当前绑定设备：无设备自动测试模式}\n");
 
     while (1) {
-	      // total_data = 0;
-	     vTaskDelay(1000 / portTICK_RATE_MS);//every 3s
+
+         int progress = rand()%100 + 1;
+
+          // total_data = 0;
+	     vTaskDelay(3000 / portTICK_RATE_MS);//every 3s
          // send_data("This is a test.\n");
+
+         // vTaskDelay(3000 / portTICK_RATE_MS);//every 3s
+         // if (last) {
+         //     sprintf(buf, "{text%d,信息,text,进度为%d}\n", i++, progress);
+         //     send_data(buf);
+         //     last = 0;
+         // }
+         //
+         // else {
+         //     sprintf(buf, "{progress%d,进度,progress,%d}\n", i, progress);
+         //     send_data(buf);
+         //     last = 1;
+         // }
+
 
          //send_data("{id,name,progress,100}\n");
 	      // bps = total_data / 3;
@@ -87,4 +120,5 @@ void tcp_conn(void *pvParameters){
 
 
     vTaskDelete(NULL);
+
 }

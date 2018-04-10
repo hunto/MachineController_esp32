@@ -21,6 +21,6 @@ void uart_event_task(void *pvParameters);
 void uart_init(void *pvParameters);
 
 void uart_data_handler(uint8_t* data);
-
+void uart_write(const char* data);
 
 #endif

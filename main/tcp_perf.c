@@ -142,12 +142,16 @@ void send_data(void *pvParameters)
 void recv_data(void *pvParameters)
 {
     int len = 0;
-    char databuff[EXAMPLE_DEFAULT_PKTSIZE];
+    char databuff[100];
     while (1) {
-	    len = recv(connect_socket, databuff, EXAMPLE_DEFAULT_PKTSIZE, 0);
+        memset(databuff, '\0', 100);
+	    len = recv(connect_socket, databuff, 100, 0);
 	    if (len > 0) {
 	        //total_data += len;
             printf("%s\n", databuff);
+            ESP_LOGI(TAG, "tcp receive content : %s", databuff);
+            *(databuff + len) = '\0';
+            uart_write(databuff);
 	    }
         else {
             if (LOG_LOCAL_LEVEL >= ESP_LOG_DEBUG) {
@@ -250,7 +254,7 @@ void wifi_init_softap()
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     wifi_config_t sta_config = {
         .sta = {
-            .ssid = "OnePlus3",
+            .ssid = "LGG6",
             .password = "1473692580",
             .bssid_set = false
         }
@@ -259,7 +263,7 @@ void wifi_init_softap()
         .ap = {
             .ssid = EXAMPLE_DEFAULT_SSID,
             .ssid_len = 0,
-            .max_connection=EXAMPLE_MAX_STA_CONN,
+            .max_connection = EXAMPLE_MAX_STA_CONN,
             .password = EXAMPLE_DEFAULT_PWD,
             .authmode = WIFI_AUTH_WPA_WPA2_PSK
         },

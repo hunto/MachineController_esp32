@@ -125,8 +125,11 @@ void uart_init(void *pvParameters) {
       int len = uart_read_bytes(EX_UART_NUM, data, BUF_SIZE, 100 / portTICK_RATE_MS);
       if(len > 0) {
           ESP_LOGI(UART_TAG, "uart read : %d", len);
+          if ((char)*data != '{' || (char)*(data + len) != '\0') {
+              continue;
+          }
 	  // TODO:sth handle the commander string
-          uart_write_bytes(EX_UART_NUM, (const char*)data, len);
+          // uart_write_bytes(EX_UART_NUM, (const char*)data, len);
           char* send = (char*)malloc(sizeof(char) * len);
           strcpy(send, (char*)data);
           uart_data_handler((uint8_t*)send);
@@ -149,5 +152,17 @@ void uart_data_handler(uint8_t* data) {
         case UART_RECEIVE_INFO:
             break;
     }
+    char* content = (char*)data;
+    int length = strlen(content);
+    ESP_LOGI(UART_TAG, "uart send length : %d", length);
+    ESP_LOGI(UART_TAG, "uart send content : %s", data);
+    *(data + length - 1) = '\n';
+    *(data + length) = '\0';
     send_data((char *)data);
+}
+
+
+void uart_write(const char* data) {
+    ESP_LOGI(UART_TAG, "uart write length : %d", strlen(data));
+    uart_write_bytes(EX_UART_NUM, data, strlen(data));
 }
